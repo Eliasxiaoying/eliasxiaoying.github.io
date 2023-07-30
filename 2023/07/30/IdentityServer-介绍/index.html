@@ -16,11 +16,11 @@
     <!--<link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>-->
     <title>
         
-          这是一篇来自hexo-admin的测试文章 - Hexo-theme-snail
+          IdentityServer 介绍 - Hexo-theme-snail
         
     </title>
 
-    <link rel="canonical" href="https://dusign.net/2023/07/16/这是一篇来自hexo-admin的测试文章/">
+    <link rel="canonical" href="https://dusign.net/2023/07/30/IdentityServer-介绍/">
 
     <!-- Bootstrap Core CSS -->
     
@@ -112,19 +112,21 @@
                     <div class="post-heading">
                         <div class="tags">
                             
+                              <a class="tag" href="/tags/#IdentityServer4" title="IdentityServer4">IdentityServer4</a>
+                            
                         </div>
-                        <h1>这是一篇来自hexo-admin的测试文章</h1>
+                        <h1>IdentityServer 介绍</h1>
                         <h2 class="subheading"></h2>
                         <span class="meta">
                             Posted by elias on
-                            2023-07-16
+                            2023-07-30
                         </span>
 
                         
                             <div class="blank_box"></div>
                             <span class="meta">
-                                Words <span class="post-count">769</span> and
-                                Reading Time <span class="post-count">2</span> Minutes
+                                Words <span class="post-count">2.3k</span> and
+                                Reading Time <span class="post-count">8</span> Minutes
                             </span>
                             <div class="blank_box"></div>
                             <!-- 不蒜子统计 start -->
@@ -272,36 +274,63 @@
                 col-md-10 col-md-offset-1
                 post-container">
 
-                <p><a name="ejMt9"></a></p>
-<h2 id="登录会话保存配置"><a href="#登录会话保存配置" class="headerlink" title="登录会话保存配置"></a>登录会话保存配置</h2><p>IdentityServer注册了两个Cookie处理程序用于处理用户登录</p>
-<ul>
-<li><code>IdentityServerConstants.DefaultCookieAuthenticationScheme</code> 默认Cookie身份验证模式</li>
-<li><code>IdentityServerConstants.ExternalCookieAuthenticationScheme</code>外部Cookie身份验证模式</li>
-</ul>
-<p>可以在注入的过程中对这两个Cookie进行配置，如设置滑动过期时间等<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">builder</span><br><span class="line">    .Services.AddAuthentication()</span><br><span class="line">    .AddCookie(IdentityServerConstants.DefaultCookieAuthenticationScheme, options =&gt;</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// 配置默认验证模式的滑动过期时间为30分钟</span></span><br><span class="line">        options.SlidingExpiration = <span class="literal">true</span>;</span><br><span class="line">        options.ExpireTimeSpan = TimeSpan.FromMinutes(<span class="number">30</span>);</span><br><span class="line">    &#125;);</span><br></pre></td></tr></table></figure></p>
-<p>也可以通过IdentityServer指定用于默认身份验证和外部身份验证的不同模式名称<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">builder.Services.AddIdentityServer(options =&gt;</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 指定IdentityServer使用 Cookies 进行身份验证；</span></span><br><span class="line">    options.Authentication.CookieAuthenticationScheme = <span class="string">"Cookies"</span>;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure><br><strong>注意：IdentityServer 在内部使用自定义方案（通过常量）调用 AddAuthentication() ，因此要覆盖它们，必须在 AddIdentityServer() 之后进行相同的调用。</strong><br><a name="wApZs"></a></p>
-<h2 id="登录流程"><a href="#登录流程" class="headerlink" title="登录流程"></a>登录流程</h2><p>当 IdentityServer 在授权端点收到请求并且用户未经过身份验证时，用户将被重定向到配置的登录页面。<br />可以通过选项 UserInteraction 上的设置告知 IdentityServer 登录页面的路径（默认为<code>/account/login</code>）。<br />此外还将传递一个 <code>returnUrl</code> 参数，当用户登录成功后应将用户重定向到何处。<br /></p>
-<p><img src="/images/pasted-2.png" alt="upload successful"></p>
-<h2 id="退出与注销"><a href="#退出与注销" class="headerlink" title="退出与注销"></a>退出与注销</h2><p>在 IdentityServer 中注销用户只需要删除身份验证的 cookie，只需在 <code>HttpContext</code> 中调用 <code>SignOutAsync</code>，并传递所使用的方案作为参数：<br><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 使用 IdentityServer 默认的身份验证Cookie</span></span><br><span class="line"><span class="keyword">await</span> HttpContext.SignOutAsync(IdentityServerConstants.DefaultCookieAuthenticationScheme);</span><br></pre></td></tr></table></figure></p>
-<p>当客户端注销时，会跳转到 IdentityServer 注销，其他客户端再次访问 IdentityServer 获取用户授权时才会得知当前用户已注销。<br />如果需要在客户端中注销，并通知其他已登陆的客户端同时注销时。有以下三种方式<br><a name="mhTo0"></a></p>
-<h3 id="前端通道"><a href="#前端通道" class="headerlink" title="前端通道"></a>前端通道</h3><p>当用户进行注销时，IdentityServer 会返回一个带有一个或多个隐藏式 <code>&lt;iframe&gt;</code> 标签的页面。<br />浏览器在注销页面加载完成后会自动调用 <code>iframe</code> 中指定的URL （在 IdentityServer 中通过 <code>FrontChannelLogoutUri</code> 配置）告知对应的客户端程序用户注销。<br />IdentityServer 会跟踪用户已登陆的客户端，当用户注销登录时，IdentityServer 会调用 <code>IIdentityServerInteractionService</code>中的 <code>GetLogoutContextAsync()</code> 方法，<br />并返回一个带有 <code>SignOutIFrameUrl</code> 属性的 <code>LogoutRequest</code> 对象，<code>SignOutIFrameUrl</code> 中包含需要渲染在 <code>&lt;iframe&gt;</code> 上的已登陆客户端信息。<br><a name="WPCkI"></a></p>
-<h3 id="后端通道"><a href="#后端通道" class="headerlink" title="后端通道"></a>后端通道</h3><p>与前端通道类似的，IdentityServer 在用户注销登录时，会调用 <code>IBackChannelLogoutService</code> 中的 <code>HttpContext.SignOutAsync()</code> 进行注销登录。<br />需要同时登出的客户端需要配置 <code>BackChannelLogoutUri</code>。<br><a name="iFu8H"></a></p>
-<h3 id="会话管理"><a href="#会话管理" class="headerlink" title="会话管理"></a>会话管理</h3><p>通过会话管理形式进行注销控制的客户端不需要进行执行其他操作，不过客户端会监视 IdentityServer 中的 <code>check_session_iframe</code> 端点，用户登出后，oidc-client JavaScript 库会自动将当前用户注销。</p>
-<p><a name="WCZGx"></a></p>
-<h2 id="客户端注销"><a href="#客户端注销" class="headerlink" title="客户端注销"></a>客户端注销</h2><p>在客户端发起注销登录时，会将当前用户重定向到 IdentityServer 的 <code>end session endpoint</code> 端点上。IdentityServer 会对用户的状态进行维护，并将客户端重定向到对应的URL（如果配置了的话）。</p>
+                <p># Identity Server 4 介绍</p>
+<h2 id="什么是-Cookies、Session"><a href="#什么是-Cookies、Session" class="headerlink" title="什么是 Cookies、Session"></a>什么是 Cookies、Session</h2><p><strong>Cookies 是存储在客户端浏览器中的小型文本文件</strong>，用于存储 Web 应用程序的用户身份验证信息和其他状态信息。当用户访问 Web 应用程序时，服务器可以向客户端浏览器发送一个包含Cookie 信息的HTTP响应头。浏览器会将这些 Cookie 信息存储在本地，并在随后的每个请求中将它们作为 HTTP 请求头发送回服务器。这使得 Web 应用程序能够在多个请求之间保持状态，并保证用户的身份验证信息得以保留。Cookies 可以设置过期时间，以便浏览器在一定时间后删除它们。</p>
+<p><strong>Session 是一种在Web服务器上存储用户状态信息的机制</strong>。当用户首次访问 Web 应用程序时，服务器会创建一个新的 Session，并将 Session ID（一种唯一的标识符）发送到客户端浏览器中。浏览器会将该 Session ID 作为Cookie信息存储在本地，并在随后的每个请求中将其作为HTTP 请求头发送回服务器。服务器使用 Session ID 来检索与该用户相关联的状态信息，并在每个请求期间更新它们。Session 与 Cookie 的关系在于，Session ID 通常是存储在 Cookie 中的，以便浏览器可以在每个请求中将其发送回服务器。</p>
+<p><strong>最早的Web应用程序使用 HTTP Authentication 来实现身份验证和授权。</strong>这种认证机制需要用户在每个请求中提供用户名和密码，服务器通过比较这些信息来验证用户身份。虽然这种机制简单易用，但它存在一些安全问题，如明文传输密码等。</p>
+<p>随着 Web 应用程序的发展，Cookie 成为一种用于存储用户认证信息的常见方法。当用户首次进行身份验证时，服务器会向客户端浏览器发送一个 Cookie，包含一个加密的身份验证令牌。浏览器在随后的每个请求中都会附带该 Cookie，以便服务器识别用户。这种基于 Cookie 的认证机制比HTTP Authentication 更安全，但仍然存在一些安全问题，如 Cookie 劫持等。</p>
+<blockquote>
+<p>Cookie劫持是一种网络攻击，攻击者通过窃取用户的Cookie来冒充用户身份，从而获取未经授权的访问权限。一旦攻击者窃取了用户的Cookie，就可以将其复制到自己的浏览器中，并在随后的请求中使用该Cookie来冒充用户身份，从而获取未经授权的访问权限。</p>
+</blockquote>
+<p>为了解决Cookie劫持等安全问题，Web应用程序开始使用基于Session的认证机制。在这种机制中，服务器为每个用户创建一个Session，并将Session ID存储在Cookie中。随后的每个请求都会附带该Cookie，以便服务器识别用户。这种机制比基于Cookie的认证更加安全，但仍然存在一些问题，如Session劫持等。</p>
+<p>随着分布式系统和基于微服务的应用程序的兴起，基于Token的认证机制逐渐成为一种流行的选择。在这种机制中，服务器会为每个用户生成一个加密的 Token，并将其发送到客户端浏览器中。浏览器在随后的每个请求中都会附带该Token，以便服务器识别用户。这种机制不需要在服务器上存储任何状态信息，更加适用于分布式系统和基于微服务的应用程序。</p>
+<h2 id="为什么使用Token"><a href="#为什么使用Token" class="headerlink" title="为什么使用Token"></a>为什么使用Token</h2><p><strong>安全性高</strong>、<strong>移植性强</strong></p>
+<ol>
+<li>安全性高：Token可以加密，并且<strong>能够验证是否被修改，安全性更高。</strong></li>
+<li>移植性强：Cookie是浏览器进行控制的，Session是存储在服务器中的，Token<strong>无状态（只存储用户的部分关键信息）</strong>，是<strong>由客户端进行管理</strong>的，且<strong>可以跨域使用</strong>，<strong>可以在多个设备之间共享、可以单独存储</strong>。</li>
+</ol>
+<p>随着分布式系统和基于微服务的应用程序的兴起，基于Token的认证机制逐渐成为一种流行的选择。在这种机制中，服务器会为每个用户生成一个加密的Token，并将其发送到客户端浏览器中。浏览器在随后的每个请求中都会附带该Token，以便服务器识别用户。这种机制不需要在服务器上存储任何状态信息，更加适用于分布式系统和基于微服务的应用程序。</p>
+<p>image-20230730160629167.png<br><img src="/images/pasted-3.png" alt="upload successful"></p>
+<p>上面是一个 <code>JWT Token</code>的示例</p>
+<p><code>JWT Token</code> 由三部分组成：Header（头部）、Payload（载荷）和 Signature（签名）。其中，Header 包含了 <code>JWT Token</code> 的类型和使用的算法等信息，Payload 包含了要传输的信息，例如用户ID、用户名、角色等，Signature 则是对 Header 和 Payload 的签名，用于验证数据的完整性和真实性。</p>
+<h2 id="为什么要使用-Identity-Server"><a href="#为什么要使用-Identity-Server" class="headerlink" title="为什么要使用 Identity Server"></a>为什么要使用 Identity Server</h2><p>6ae2d600058d433aa3ffb65ae925cc8etplv-k3u1fbpfcp-zoom-in-crop-mark4536000.webp<br><img src="/images/pasted-4.png" alt="upload successful"></p>
+<ol>
+<li>联合登陆：通过开放认证平台由第三方应用做身份担保，使用户可以活得本系统的相关权限。</li>
+<li>单点登陆：将用户的信息集中管理，不同系统之间对用户信息进行共享。</li>
+</ol>
+<p>（使用<a href="https://www.cnblogs.com/" target="_blank" rel="noopener">博客园</a>、<a href="https://gitee.com/" target="_blank" rel="noopener">Gitee</a>、<a href="https://github.com/" target="_blank" rel="noopener">Github</a> 进行演示）</p>
+<h2 id="Identity-Server-能做什么"><a href="#Identity-Server-能做什么" class="headerlink" title="Identity Server 能做什么"></a>Identity Server 能做什么</h2><p><a href="http://www.ruanyifeng.com/blog/2019/04/oauth_design.html" target="_blank" rel="noopener">OAuth 2.0 的一个简单解释 - 阮一峰的网络日志 (ruanyifeng.com)</a></p>
+<p><a href="https://www.cnblogs.com/yangxu-pro/p/9405796.html" target="_blank" rel="noopener">学习Identity Server 4的预备知识 (误删, 重补) - yangxu-pro - 博客园 (cnblogs.com)</a></p>
+<p><a href="https://www.cnblogs.com/savorboard/p/aspnetcore-identity.html" target="_blank" rel="noopener">ASP.NET Core 之 Identity 入门（一） - Savorboard - 博客园 (cnblogs.com)</a></p>
+<p>简单来说，Identity Server 中实现了两种功能，分别对应了两种协议：</p>
+<p>认证 <code>Authentication</code>：解决了 <strong>”你是谁“</strong> 的问题。 对应协议：<code>OpenIdConnect</code></p>
+<p>授权 <code>Authorization</code>：解决了 <strong>”你能做什么，不能做什么“</strong> 的问题。对应协议：<code>OAuth2.0</code></p>
+<h2 id="授权认证的五种模式"><a href="#授权认证的五种模式" class="headerlink" title="授权认证的五种模式"></a>授权认证的五种模式</h2><p><a href="http://www.ruanyifeng.com/blog/2019/04/oauth-grant-types.html" target="_blank" rel="noopener">OAuth 2.0 的四种方式 - 阮一峰的网络日志 (ruanyifeng.com)</a></p>
+<ol>
+<li>密码式（password）</li>
+<li><p>客户端凭证（client credentials）</p>
+</li>
+<li><p>交互式（implicit）</p>
+</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">sequenceDiagram</span><br><span class="line">participant 用户</span><br><span class="line">participant 客户端</span><br><span class="line">participant 授权服务器</span><br><span class="line">用户-&gt;&gt;+客户端: 访问客户端，且不存在Token</span><br><span class="line">客户端 -&gt;&gt; 授权服务器: 客户端请求授权服务器获取用户信息</span><br><span class="line">授权服务器 -&gt;&gt; 授权服务器: 授权服务器验证客户端信息</span><br><span class="line">授权服务器 -&gt;&gt; 用户: 客户端将用户重定向至授权服务器进行授权</span><br><span class="line">用户 -&gt;&gt; 授权服务器: 用户通过账号密码进行授权</span><br><span class="line">授权服务器 -&gt;&gt; 授权服务器: 授权服务器对用户和客户端进行验证</span><br><span class="line">授权服务器 -&gt;&gt; 客户端: 授权服务器将用户允许访问的信息返回给客户端</span><br><span class="line">客户端-&gt;&gt;用户: 用户登陆成功</span><br></pre></td></tr></table></figure>
+<ol>
+<li>授权码式（authorization-code）</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">sequenceDiagram</span><br><span class="line">participant 用户</span><br><span class="line">participant 客户端</span><br><span class="line">participant 授权服务器</span><br><span class="line">用户-&gt;&gt;+客户端: 访问客户端，且不存在Token</span><br><span class="line">客户端 -&gt;&gt; 授权服务器: 客户端请求授权服务器获取用户信息</span><br><span class="line">授权服务器 -&gt;&gt; 授权服务器: 授权服务器验证客户端信息</span><br><span class="line">授权服务器 -&gt;&gt; 用户: 客户端将用户重定向至授权服务器进行授权</span><br><span class="line">用户 -&gt;&gt; 授权服务器: 用户通过账号密码进行授权</span><br><span class="line">授权服务器 -&gt;&gt; 授权服务器: 授权服务器对用户和客户端进行验证</span><br><span class="line">授权服务器 -&gt;&gt; 客户端: 授权服务器将用户允许访问的信息以授权码形式返回给客户端</span><br><span class="line">客户端 -&gt;&gt; 授权服务器: 客户端在网站后端请求授权服务器, 通过授权码获取用户信息</span><br><span class="line">授权服务器 -&gt;&gt; 客户端: 客户端成功获取用户信息</span><br><span class="line">客户端-&gt;&gt;用户: 用户登陆成功</span><br></pre></td></tr></table></figure>
+<ol>
+<li>设备流式（deviceflow）</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">sequenceDiagram</span><br><span class="line">participant 用户</span><br><span class="line">participant 客户端</span><br><span class="line">participant 授权服务器</span><br><span class="line">用户-&gt;&gt;+客户端: 访问客户端</span><br><span class="line">客户端 -&gt;&gt; 授权服务器: 客户端请求授权服务器</span><br><span class="line">授权服务器 -&gt;&gt; 授权服务器: 授权服务器验证客户端信息</span><br><span class="line">授权服务器 -&gt;&gt; 客户端: 授权服务器将用户码、设备码、以及用户授权地址返回客户端</span><br><span class="line">客户端 -&gt;&gt; 用户: 客户端将用户导向授权服务器设置的授权地址</span><br><span class="line">用户 -&gt;&gt; 授权服务器: 用户在授权服务器制定的地址对客户端进行授权</span><br><span class="line">loop</span><br><span class="line">        客户端 -&gt;&gt; 授权服务器: 客户端向服务器请求Token, 如果用户授权，授权服务器就返回token信息，否则客户端会在指定时间间隔后再次请求，直至授权超时</span><br><span class="line">        授权服务器 -&gt;&gt; 客户端: Token</span><br><span class="line">end</span><br><span class="line">客户端-&gt;&gt;用户: 用户登陆成功</span><br></pre></td></tr></table></figure>
 
                 
                 <hr>
                 <!-- Pager -->
                 <ul class="pager">
                     
-                    <li class="previous">
-                        <a href="/2023/07/30/IdentityServer-介绍/" data-toggle="tooltip" data-placement="top" title="IdentityServer 介绍">&larr; Previous Post</a>
-                    </li>
-                    
                     
                     <li class="next">
-                        <a href="/2019/11/01/Hexo-Theme-Snail/" data-toggle="tooltip" data-placement="top" title="Hexo-Theme-Snail">Next Post &rarr;</a>
+                        <a href="/2023/07/16/这是一篇来自hexo-admin的测试文章/" data-toggle="tooltip" data-placement="top" title="这是一篇来自hexo-admin的测试文章">Next Post &rarr;</a>
                     </li>
                     
                 </ul>
@@ -414,7 +443,7 @@
           <strong class="toc-title">Contents</strong>
           
             
-              <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#登录会话保存配置"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">登录会话保存配置</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#登录流程"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">登录流程</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#退出与注销"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">退出与注销</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#前端通道"><span class="toc-nav-number">3.1.</span> <span class="toc-nav-text">前端通道</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#后端通道"><span class="toc-nav-number">3.2.</span> <span class="toc-nav-text">后端通道</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#会话管理"><span class="toc-nav-number">3.3.</span> <span class="toc-nav-text">会话管理</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#客户端注销"><span class="toc-nav-number">4.</span> <span class="toc-nav-text">客户端注销</span></a></li></ol>
+              <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#什么是-Cookies、Session"><span class="toc-nav-number">1.</span> <span class="toc-nav-text">什么是 Cookies、Session</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#为什么使用Token"><span class="toc-nav-number">2.</span> <span class="toc-nav-text">为什么使用Token</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#为什么要使用-Identity-Server"><span class="toc-nav-number">3.</span> <span class="toc-nav-text">为什么要使用 Identity Server</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#Identity-Server-能做什么"><span class="toc-nav-number">4.</span> <span class="toc-nav-text">Identity Server 能做什么</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#授权认证的五种模式"><span class="toc-nav-number">5.</span> <span class="toc-nav-text">授权认证的五种模式</span></a></li></ol>
             
           
           </div>
@@ -436,6 +465,8 @@
                     <h5><a href="/tags/">FEATURED TAGS</a></h5>
                     <div class="tags">
                        
+                          <a class="tag" href="/tags/#IdentityServer4" title="IdentityServer4">IdentityServer4</a>
+                        
                     </div>
                 </section>
                 
