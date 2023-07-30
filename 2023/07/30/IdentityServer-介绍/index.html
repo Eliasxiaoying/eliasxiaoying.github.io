@@ -112,8 +112,6 @@
                     <div class="post-heading">
                         <div class="tags">
                             
-                              <a class="tag" href="/tags/#IdentityServer4" title="IdentityServer4">IdentityServer4</a>
-                            
                         </div>
                         <h1>IdentityServer 介绍</h1>
                         <h2 class="subheading"></h2>
@@ -125,8 +123,8 @@
                         
                             <div class="blank_box"></div>
                             <span class="meta">
-                                Words <span class="post-count">2.3k</span> and
-                                Reading Time <span class="post-count">8</span> Minutes
+                                Words <span class="post-count">1.6k</span> and
+                                Reading Time <span class="post-count">5</span> Minutes
                             </span>
                             <div class="blank_box"></div>
                             <!-- 不蒜子统计 start -->
@@ -290,15 +288,14 @@
 <li>移植性强：Cookie是浏览器进行控制的，Session是存储在服务器中的，Token<strong>无状态（只存储用户的部分关键信息）</strong>，是<strong>由客户端进行管理</strong>的，且<strong>可以跨域使用</strong>，<strong>可以在多个设备之间共享、可以单独存储</strong>。</li>
 </ol>
 <p>随着分布式系统和基于微服务的应用程序的兴起，基于Token的认证机制逐渐成为一种流行的选择。在这种机制中，服务器会为每个用户生成一个加密的Token，并将其发送到客户端浏览器中。浏览器在随后的每个请求中都会附带该Token，以便服务器识别用户。这种机制不需要在服务器上存储任何状态信息，更加适用于分布式系统和基于微服务的应用程序。</p>
-<p>image-20230730160629167.png<br><img src="/images/pasted-3.png" alt="upload successful"></p>
+<p><img src="/images/pasted-3.png" alt="upload successful"></p>
 <p>上面是一个 <code>JWT Token</code>的示例</p>
 <p><code>JWT Token</code> 由三部分组成：Header（头部）、Payload（载荷）和 Signature（签名）。其中，Header 包含了 <code>JWT Token</code> 的类型和使用的算法等信息，Payload 包含了要传输的信息，例如用户ID、用户名、角色等，Signature 则是对 Header 和 Payload 的签名，用于验证数据的完整性和真实性。</p>
-<h2 id="为什么要使用-Identity-Server"><a href="#为什么要使用-Identity-Server" class="headerlink" title="为什么要使用 Identity Server"></a>为什么要使用 Identity Server</h2><p>6ae2d600058d433aa3ffb65ae925cc8etplv-k3u1fbpfcp-zoom-in-crop-mark4536000.webp<br><img src="/images/pasted-4.png" alt="upload successful"></p>
+<h2 id="为什么要使用-Identity-Server"><a href="#为什么要使用-Identity-Server" class="headerlink" title="为什么要使用 Identity Server"></a>为什么要使用 Identity Server</h2><p><img src="/images/pasted-4.png" alt="upload successful"></p>
 <ol>
 <li>联合登陆：通过开放认证平台由第三方应用做身份担保，使用户可以活得本系统的相关权限。</li>
 <li>单点登陆：将用户的信息集中管理，不同系统之间对用户信息进行共享。</li>
 </ol>
-<p>（使用<a href="https://www.cnblogs.com/" target="_blank" rel="noopener">博客园</a>、<a href="https://gitee.com/" target="_blank" rel="noopener">Gitee</a>、<a href="https://github.com/" target="_blank" rel="noopener">Github</a> 进行演示）</p>
 <h2 id="Identity-Server-能做什么"><a href="#Identity-Server-能做什么" class="headerlink" title="Identity Server 能做什么"></a>Identity Server 能做什么</h2><p><a href="http://www.ruanyifeng.com/blog/2019/04/oauth_design.html" target="_blank" rel="noopener">OAuth 2.0 的一个简单解释 - 阮一峰的网络日志 (ruanyifeng.com)</a></p>
 <p><a href="https://www.cnblogs.com/yangxu-pro/p/9405796.html" target="_blank" rel="noopener">学习Identity Server 4的预备知识 (误删, 重补) - yangxu-pro - 博客园 (cnblogs.com)</a></p>
 <p><a href="https://www.cnblogs.com/savorboard/p/aspnetcore-identity.html" target="_blank" rel="noopener">ASP.NET Core 之 Identity 入门（一） - Savorboard - 博客园 (cnblogs.com)</a></p>
@@ -313,15 +310,15 @@
 <li><p>交互式（implicit）</p>
 </li>
 </ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">sequenceDiagram</span><br><span class="line">participant 用户</span><br><span class="line">participant 客户端</span><br><span class="line">participant 授权服务器</span><br><span class="line">用户-&gt;&gt;+客户端: 访问客户端，且不存在Token</span><br><span class="line">客户端 -&gt;&gt; 授权服务器: 客户端请求授权服务器获取用户信息</span><br><span class="line">授权服务器 -&gt;&gt; 授权服务器: 授权服务器验证客户端信息</span><br><span class="line">授权服务器 -&gt;&gt; 用户: 客户端将用户重定向至授权服务器进行授权</span><br><span class="line">用户 -&gt;&gt; 授权服务器: 用户通过账号密码进行授权</span><br><span class="line">授权服务器 -&gt;&gt; 授权服务器: 授权服务器对用户和客户端进行验证</span><br><span class="line">授权服务器 -&gt;&gt; 客户端: 授权服务器将用户允许访问的信息返回给客户端</span><br><span class="line">客户端-&gt;&gt;用户: 用户登陆成功</span><br></pre></td></tr></table></figure>
+<p><img src="/images/images0.png" alt="upload successful"></p>
 <ol>
 <li>授权码式（authorization-code）</li>
 </ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">sequenceDiagram</span><br><span class="line">participant 用户</span><br><span class="line">participant 客户端</span><br><span class="line">participant 授权服务器</span><br><span class="line">用户-&gt;&gt;+客户端: 访问客户端，且不存在Token</span><br><span class="line">客户端 -&gt;&gt; 授权服务器: 客户端请求授权服务器获取用户信息</span><br><span class="line">授权服务器 -&gt;&gt; 授权服务器: 授权服务器验证客户端信息</span><br><span class="line">授权服务器 -&gt;&gt; 用户: 客户端将用户重定向至授权服务器进行授权</span><br><span class="line">用户 -&gt;&gt; 授权服务器: 用户通过账号密码进行授权</span><br><span class="line">授权服务器 -&gt;&gt; 授权服务器: 授权服务器对用户和客户端进行验证</span><br><span class="line">授权服务器 -&gt;&gt; 客户端: 授权服务器将用户允许访问的信息以授权码形式返回给客户端</span><br><span class="line">客户端 -&gt;&gt; 授权服务器: 客户端在网站后端请求授权服务器, 通过授权码获取用户信息</span><br><span class="line">授权服务器 -&gt;&gt; 客户端: 客户端成功获取用户信息</span><br><span class="line">客户端-&gt;&gt;用户: 用户登陆成功</span><br></pre></td></tr></table></figure>
+<p><img src="/images/images1.png" alt="upload successful"></p>
 <ol>
 <li>设备流式（deviceflow）</li>
 </ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">sequenceDiagram</span><br><span class="line">participant 用户</span><br><span class="line">participant 客户端</span><br><span class="line">participant 授权服务器</span><br><span class="line">用户-&gt;&gt;+客户端: 访问客户端</span><br><span class="line">客户端 -&gt;&gt; 授权服务器: 客户端请求授权服务器</span><br><span class="line">授权服务器 -&gt;&gt; 授权服务器: 授权服务器验证客户端信息</span><br><span class="line">授权服务器 -&gt;&gt; 客户端: 授权服务器将用户码、设备码、以及用户授权地址返回客户端</span><br><span class="line">客户端 -&gt;&gt; 用户: 客户端将用户导向授权服务器设置的授权地址</span><br><span class="line">用户 -&gt;&gt; 授权服务器: 用户在授权服务器制定的地址对客户端进行授权</span><br><span class="line">loop</span><br><span class="line">        客户端 -&gt;&gt; 授权服务器: 客户端向服务器请求Token, 如果用户授权，授权服务器就返回token信息，否则客户端会在指定时间间隔后再次请求，直至授权超时</span><br><span class="line">        授权服务器 -&gt;&gt; 客户端: Token</span><br><span class="line">end</span><br><span class="line">客户端-&gt;&gt;用户: 用户登陆成功</span><br></pre></td></tr></table></figure>
+<p><img src="/images/images2.png" alt="upload successful"></p>
 
                 
                 <hr>
@@ -465,8 +462,6 @@
                     <h5><a href="/tags/">FEATURED TAGS</a></h5>
                     <div class="tags">
                        
-                          <a class="tag" href="/tags/#IdentityServer4" title="IdentityServer4">IdentityServer4</a>
-                        
                     </div>
                 </section>
                 
